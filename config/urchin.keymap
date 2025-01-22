@@ -80,7 +80,7 @@
 			bindings = <&mo SETTINGS>;
 		};
 		// Base 
-		// q w 
+		// q w - ESC
 		base_esc {
 			timeout-ms = <COMBO_TERM_SHORT>;
 			key-positions = <0 1>;
@@ -88,15 +88,15 @@
 			layers = <BASE>;
 		};
 
-		// q w e
-		base_esc {
+		// q w e - Tab
+		base_tab {
 			timeout-ms = <COMBO_TERM_SHORT>;
 			key-positions = <0 1 2>;
 			bindings = <&kp TAB>;
 			layers = <BASE>;
 		};
 
-    // i o p
+    // i o p - Backspace
 		base_backspace {
 			timeout-ms = <COMBO_TERM_SHORT>;
 			key-positions = <7 8 9>;
@@ -104,11 +104,11 @@
 			layers = <BASE>;
 		};
 
-    // . /
-		base_backspace {
+    // . / - Enter
+		base_enter {
 			timeout-ms = <COMBO_TERM_SHORT>;
 			key-positions = <26 27>;
-			bindings = <&kp BSPC>;
+			bindings = <&kp ENTER>;
 			layers = <BASE>;
 		};
 };
