@@ -85,12 +85,14 @@
 			timeout-ms = <COMBO_TERM_SHORT>;
 			key-positions = <0 1>;
 			bindings = <&kp ESC>;
+			layers = <BASE>;
 		};
     // o p
 		base_backspace {
 			timeout-ms = <COMBO_TERM_SHORT>;
 			key-positions = <8 9>;
 			bindings = <&kp BSPC>;
+			layers = <BASE>;
 		};
 };
 
