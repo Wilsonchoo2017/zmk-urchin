@@ -98,16 +98,16 @@
 
     // i o p - Backspace
 		base_backspace {
-			timeout-ms = <COMBO_TERM_NORMAL>;
+			timeout-ms = <COMBO_TERM_LONG>;
 			key-positions = <7 8 9>;
 			bindings = <&kp BSPC>;
 			layers = <BASE>;
 		};
 
-    // . / - Enter
+    // , . - Enter
 		base_enter {
 			timeout-ms = <COMBO_TERM_NORMAL>;
-			key-positions = <26 27>;
+			key-positions = <27 28>;
 			bindings = <&kp ENTER>;
 			layers = <BASE>;
 		};
