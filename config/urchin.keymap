@@ -87,7 +87,13 @@
 			bindings = <&kp ESC>;
 			layers = <BASE>;
 		};
-    // o p
+		base_esc {
+			timeout-ms = <COMBO_TERM_SHORT>;
+			key-positions = <0 1 2>;
+			bindings = <&kp TAB>;
+			layers = <BASE>;
+		};
+    // i o p
 		base_backspace {
 			timeout-ms = <COMBO_TERM_SHORT>;
 			key-positions = <7 8 9>;
