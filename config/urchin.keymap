@@ -90,7 +90,7 @@
     // o p
 		base_backspace {
 			timeout-ms = <COMBO_TERM_SHORT>;
-			key-positions = <8 9>;
+			key-positions = <7 8 9>;
 			bindings = <&kp BSPC>;
 			layers = <BASE>;
 		};
