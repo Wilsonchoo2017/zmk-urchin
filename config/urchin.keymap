@@ -79,13 +79,13 @@
 			timeout-ms = <200>;
 			key-positions = <0 1>;
 			bindings = <&kp ESC>;
-		}
+		};
     // o p
 		base_backspace {
 			timeout-ms = <200>;
 			key-positions = <8 9>;
 			bindings = <&kp BSPC>;
-		}
+		};
 };
 
 	keymap {
