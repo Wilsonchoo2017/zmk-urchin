@@ -82,7 +82,7 @@
 		// Base 
 		// q w - ESC
 		base_esc {
-			timeout-ms = <COMBO_TERM_SHORT>;
+			timeout-ms = <COMBO_TERM_NORMAL>;
 			key-positions = <0 1>;
 			bindings = <&kp ESC>;
 			layers = <BASE>;
@@ -90,7 +90,7 @@
 
 		// q w e - Tab
 		base_tab {
-			timeout-ms = <COMBO_TERM_SHORT>;
+			timeout-ms = <COMBO_TERM_NORMAL>;
 			key-positions = <0 1 2>;
 			bindings = <&kp TAB>;
 			layers = <BASE>;
@@ -98,7 +98,7 @@
 
     // i o p - Backspace
 		base_backspace {
-			timeout-ms = <COMBO_TERM_SHORT>;
+			timeout-ms = <COMBO_TERM_NORMAL>;
 			key-positions = <7 8 9>;
 			bindings = <&kp BSPC>;
 			layers = <BASE>;
@@ -106,7 +106,7 @@
 
     // . / - Enter
 		base_enter {
-			timeout-ms = <COMBO_TERM_SHORT>;
+			timeout-ms = <COMBO_TERM_NORMAL>;
 			key-positions = <26 27>;
 			bindings = <&kp ENTER>;
 			layers = <BASE>;
