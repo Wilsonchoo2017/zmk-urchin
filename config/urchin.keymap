@@ -96,10 +96,10 @@
 			layers = <BASE>;
 		};
 
-    // i o p - Backspace
+    // k; - Backspace
 		base_backspace {
 			timeout-ms = <COMBO_TERM_LONG>;
-			key-positions = <7 8 9>;
+			key-positions = <17 19>;
 			bindings = <&kp BSPC>;
 			layers = <BASE>;
 		};
