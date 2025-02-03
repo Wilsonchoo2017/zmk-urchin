@@ -8,7 +8,7 @@
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/outputs.h>
-#include "keymap_italian.h"
+#include “keymap_italian.h”
 
 // Layer definitions
 #define BASE 0
@@ -27,7 +27,7 @@
 // ------
 
 &sk {
-	// don't release mods on other mods presses
+	// don’t release mods on other mods presses
 	ignore-modifiers;
 };
 
@@ -36,12 +36,12 @@
 	behaviors {
 		// Enables holding the first mod-tap key
 		// by performing a tap-release-hold sequence.
-		// To use it: "&qt KEYCODE1 KEYCODE2"
+		// To use it: ”&qt KEYCODE1 KEYCODE2”
 		qt: quick_tap {
-			compatible = "zmk,behavior-hold-tap";
-			label = "QUICK_TAP";
+			compatible = “zmk,behavior-hold-tap”;
+			label = “QUICK_TAP”;
 			#binding-cells = <2>;
-			flavor = "hold-preferred";
+			flavor = “hold-preferred”;
 			tapping-term-ms = <200>;
 			quick-tap-ms = <200>;
 			bindings = <&kp>, <&kp>;
@@ -52,15 +52,15 @@
 		// sometimes my device thinks a modifier is being held down
 		// pressing all modifiers fixes it.
 		unstick: unstick {
-			label = "ZM_unstick";
-			compatible = "zmk,behavior-macro";
+			label = “ZM_unstick”;
+			compatible = “zmk,behavior-macro”;
 			#binding-cells = <0>;
 			bindings = <&kp LSHIFT &kp RSHIFT &kp LCTRL &kp RCTRL &kp LALT &kp RALT &kp LGUI &kp RGUI>;
 		};
 	};
 
 	combos {
-		compatible = "zmk,combos";
+		compatible = “zmk,combos”;
 		// both right thumb keys
 		combo_accent {
 			timeout-ms = <100>;
@@ -114,21 +114,21 @@
 };
 
 	keymap {
-		compatible = "zmk,keymap";
+		compatible = “zmk,keymap”;
 		// Base alpha layer
 		default_layer {
-			label = "Base";
+			label = “Base”;
 			bindings = <
 			&kp Q &kp W &kp E &kp R &kp T           &kp Y &kp U  &kp I     &kp O   &kp P 
 			&kp A &kp S &kp D &kp F &kp G           &kp H &kp J  &kp K     &kp L &kp SEMICOLON
 			&kp Z &kp X &kp C &kp V &kp B           &kp N &kp M  &kp COMMA &kp DOT &kp SLASH
-							&mo EXT &qt LSHIFT SPACE           &kp SPACE &sl SYM
+							&mo EXT &qt LSHIFT BSPC           &kp SPACE &sl SYM
 			>;
 		};
 
 		// Numbers and high frequency symbols
 		sym_layer {
-			label = "Sym.";
+			label = “Sym.”;
 			bindings = <
 			&kp N1 &kp N2 &kp N3 &kp N4 &kp N5		                                    							 &kp N6 &kp N7 &kp N8 &kp N9 &kp N0
 			&none &kp PERCENT &kp LEFT_PARENTHESIS &kp LEFT_BRACE &kp LEFT_BRACKET 	    		 &kp EQUAL  &none  &kp SINGLE_QUOTE &kp PLUS &kp ASTERISK 
@@ -139,7 +139,7 @@
 
 		// Main modifiers and arrow keys
 		ext_layer {
-			label = "Mods";
+			label = “Mods”;
 			bindings = <
 			&kp ESC  &kp C_PREV &kp C_PP  &kp C_NEXT  &kp C_PAUSE    	&kp PG_UP  &kp HOME &kp UP &kp END &none
 			&sk LALT &sk LGUI  &sk LSHIFT  &sk LCTRL  &trans 			&kp PG_DN &kp LEFT  &kp DOWN  &kp RIGHT   &kp DEL
@@ -150,7 +150,7 @@
 
 		// Function keys with modifiers
 		fnc_layer {
-			label = "FRow";
+			label = “FRow”;
 			bindings = <
 			&kp F1 &kp F2 &kp F3 &kp F4 &kp F5                  &kp F6 &kp F7 &kp F8 &kp F9 &kp F10 
 			&sk LALT &sk LGUI &sk LSHIFT &sk LCTRL &none     &kp F11 &kp F12  &kp PRINTSCREEN &trans &trans
@@ -161,7 +161,7 @@
 
 		// Low frequency symbols.
 		symbols_2_layer {
-			label = "Sym.2";
+			label = “Sym.2”;
 			bindings = <
 			&kp CARET &kp UNDERSCORE &kp IT_PND &kp IT_EUR &kp HASH         &none &none &none &none &none 
 			&kp GRAVE &kp TILDE &kp BACKSLASH &kp PIPE &kp AMPERSAND         &none &none &none &none &none
@@ -172,7 +172,7 @@
 
 		// Used to type regional accents.
 		accent_layer {
-			label = "Accent";
+			label = “Accent”;
 			bindings = <
 			&none &none &none &kp IT_CEGR &none                         &none &none &none &none &none 
 			&kp IT_AGRV &kp IT_IGRV &kp IT_OGRV &kp IT_EGRV &kp IT_EACU &none &none &none &none &none
@@ -181,9 +181,9 @@
 			>;
 		};
 
-		// Used to change the keyboard's settings.
+		// Used to change the keyboard’s settings.
 		settings_layer {
-				label = "Sett.";
+				label = “Sett.”;
 				bindings = <
 				&bootloader &none &none &bt BT_CLR &bt BT_SEL 0               &bt BT_SEL 3 &none &unstick &none &bootloader 
 				&none &none &none &none      &bt BT_SEL 1 						  &bt BT_SEL 4 &none &none &none &none
