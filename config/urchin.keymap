@@ -83,7 +83,7 @@
 		// Base 
 		// q w - ESC
 		base_esc {
-			timeout-ms = <COMBO_TERM_NORMAL>;
+			timeout-ms = <COMBO_TERM_EXTRALONG>;
 			key-positions = <0 1>;
 			bindings = <&kp ESC>;
 			layers = <BASE>;
