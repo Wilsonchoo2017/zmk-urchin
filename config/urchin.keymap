@@ -39,6 +39,21 @@
 			bindings = <&kp>, <&kp>;
 		};
 
+		// Sticky layer that drops on the next key PRESS instead of
+		// the next key release. The default &sl keeps the layer live
+		// until the next key is released, so a cross-hand roll off a
+		// symbol (' then s) still lands on the symbol layer and gave
+		// '% instead of 's.
+		sl_q: sticky_layer_quick {
+			compatible = "zmk,behavior-sticky-key";
+			label = "STICKY_LAYER_QUICK";
+			#binding-cells = <1>;
+			bindings = <&mo>;
+			release-after-ms = <1000>;
+			quick-release;
+			ignore-modifiers;
+		};
+
 		// Sticky layer that only arms once the key is RELEASED.
 		// A bare "&sl" binds "&mo", so the layer is live while the
 		// thumb is still down and fast rolls leak into it
@@ -54,7 +69,7 @@
 			#binding-cells = <2>;
 			flavor = "tap-preferred";
 			tapping-term-ms = <250>;
-			bindings = <&mo>, <&sl>;
+			bindings = <&mo>, <&sl_q>;
 		};
 	};
 
@@ -106,6 +121,17 @@
 			timeout-ms = <COMBO_TERM_LONG>;
 			key-positions = <17 19>;
 			bindings = <&kp BSPC>;
+			layers = <BASE>;
+		};
+
+    // l ; - Apostrophe
+		// Mirrors QWERTY, where ' sits just past ;. Neither key rolls
+		// into the other in prose, so a long window is safe here and
+		// keeps the most common punctuation off the SYM layer.
+		base_apostrophe {
+			timeout-ms = <COMBO_TERM_EXTRALONG>;
+			key-positions = <18 19>;
+			bindings = <&kp SINGLE_QUOTE>;
 			layers = <BASE>;
 		};
 
