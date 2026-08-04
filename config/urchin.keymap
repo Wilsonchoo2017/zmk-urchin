@@ -142,6 +142,17 @@
 			bindings = <&kp ENTER>;
 			layers = <BASE>;
 		};
+
+    // f j - Space
+		// Moves space off the thumb (which was getting overworked) onto
+		// both index fingers instead. No English word has f directly
+		// followed by j, so a long window is safe here.
+		base_space {
+			timeout-ms = <COMBO_TERM_LONG>;
+			key-positions = <13 16>;
+			bindings = <&kp SPACE>;
+			layers = <BASE>;
+		};
 };
 
 	keymap {
@@ -153,7 +164,7 @@
 			&kp Q &kp W &kp E &kp R &kp T           &kp Y &kp U  &kp I     &kp O   &kp P 
 			&kp A &kp S &kp D &kp F &kp G           &kp H &kp J  &kp K     &kp L &kp SEMICOLON
 			&kp Z &kp X &kp C &kp V &kp B           &kp N &kp M  &kp COMMA &kp DOT &kp SLASH
-							&mo EXT &qt LSHIFT BSPC           &kp SPACE &slt SYM SYM
+							&mo EXT &qt LSHIFT BSPC           &kp TAB &slt SYM SYM
 			>;
 		};
 
