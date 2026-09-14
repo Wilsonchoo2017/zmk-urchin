@@ -16,6 +16,16 @@
 #define FNC 3
 #define SYM2 4
 #define SETTINGS 5
+// ARTSEY layer ids: must stay AFTER the layers above, because a layer's id is
+// its position among the `keymap` node's children and the ARTSEY layers are
+// appended by the artsey.dtsi include at the very bottom of this file.
+#define ARTSEY 6
+#define ARTSEY_NUMBERS 7
+#define ARTSEY_SYMBOLS 8
+#define ARTSEY_PAREN 9
+#define ARTSEY_NAV 10
+#define ARTSEY_BT 11
+#define ARTSEY_CUSTOM 12
 // -----------------
 
 #define COMBO_TERM_NORMAL 22
@@ -91,12 +101,16 @@
 			timeout-ms = <COMBO_TERM_NORMAL>;
 			key-positions = <31 33>;
 			bindings = <&mo SYM2>;
+			// Gated to the normal layers so it cannot fire while the
+			// ARTSEY layer is up (position 31 is SPACE there).
+			layers = <BASE SYM EXT FNC SYM2 SETTINGS>;
 		};
 		// both left thumb keys
 		combo_settings {
 			timeout-ms = <COMBO_TERM_NORMAL>;
 			key-positions = <30 31>;
 			bindings = <&mo SETTINGS>;
+			layers = <BASE SYM EXT FNC SYM2 SETTINGS>;
 		};
 		// Base 
 		// q w - ESC
@@ -205,12 +219,22 @@
 		settings_layer {
 				label = "Sett.";
 				bindings = <
-				&bootloader &none &none &bt BT_CLR &bt BT_SEL 0               &bt BT_SEL 3 &none &unstick &none &bootloader 
+				&bootloader &tog ARTSEY &none &bt BT_CLR &bt BT_SEL 0          &bt BT_SEL 3 &none &unstick &none &bootloader 
 				&none &none &none &none      &bt BT_SEL 1 						  &bt BT_SEL 4 &none &none &none &none
 				&studio_unlock &none &none &none      &bt BT_SEL 2               &bt BT_SEL 5 &none &none &none &studio_unlock
-										&none &none                         &none &none 
+														&none &none                         &none &none 
 				>;
 		};
 
 	};
 };
+
+/*
+ * ARTSEY one-handed typing mode (layers ARTSEY..ARTSEY_CUSTOM, ids 6-12).
+ * The layer order above is what fixes those ids: the included file appends its
+ * `keymap` children after the six layers defined above.
+ *
+ * Toggle it from the SETTINGS layer, position 1 (top row, second key).
+ * While it is up, the 8-key ARTSEY combos take over the left half.
+ */
+#include "artsey.dtsi"

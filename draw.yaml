@@ -1,0 +1,14 @@
+# keymap-drawer config for the Urchin ARTSEY keymap.
+# Regenerate with:
+#   uvx --from keymap-drawer keymap parse -c 10 -z config/urchin.keymap -o /tmp/ke.yaml
+#   uvx --from keymap-drawer keymap -c draw.yaml draw -j config/urchin.json /tmp/ke.yaml -o urchin-keymap.svg
+#   rsvg-convert -f pdf -o urchin-keymap.pdf urchin-keymap.svg
+draw_config:
+  # Two layer panels per row, matching the layout used in the committed diagram.
+  n_columns: 2
+  key_w: 50
+  key_h: 50
+  # ARTSEY maps 42 combos onto 8 keys; drawing them on top of the keys is
+  # unreadable, so each combo gets its own scaled-down diagram instead.
+  separate_combo_diagrams: true
+  combo_diagrams_scale: 2

@@ -1,0 +1,336 @@
+/*
+ * Copyright (c) 2021 Mike "KemoNine" Crosson
+ * Copyright (c) 2026 Wilson Choo (Urchin port)
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * ARTSEY one-handed typing, adapted from
+ * https://github.com/artseyio/zmk-artsey  (config/artsey.dtsi)
+ * for the Urchin split keyboard (duckyb/urchin-zmk-firmware).
+ *
+ * WHAT CHANGED vs UPSTREAM
+ *   1. Layer IDs. Upstream owns layers 0-8. The Urchin already uses 0-5
+ *      (BASE/SYM/EXT/FNC/SYM2/SETTINGS), so ARTSEY lives on 6-12 and every
+ *      `layers = <...>` gate is re-pointed at them.
+ *   2. Key positions. Upstream's ARTSEY keys are positional macros that the
+ *      including keymap must define. They are set here for the Urchin's
+ *      5-column left half, using columns 0-3 of rows 0 and 1:
+ *        row 0 :  S  T  R  A       (positions 0  1  2  3)
+ *        row 1 :  O  I  Y  E       (positions 10 11 12 13)
+ *      Col 0 is the pinky column, col 3 the index, so A and E land on the
+ *      index finger as ARTSEY requires for left-handed use.
+ *   3. Combo gating. Upstream's combos are mostly un-gated (active on every
+ *      layer) because upstream firmware *is* ARTSEY. Here every combo is
+ *      gated to the ARTSEY layer, so normal typing is untouched.
+ *   4. No global &sk / &sl overrides. Upstream stretches the sticky-key
+ *      release window to 5 s. The Urchin already uses &sk for its own sticky
+ *      modifiers, so that override is deliberately omitted.
+ *   5. `tapping_term_ms` -> `tapping-term-ms` (the spelling ZMK v0.3.0 wants).
+ *
+ * The including keymap MUST define, before this file is included:
+ *   ARTSEY ARTSEY_NUMBERS ARTSEY_SYMBOLS ARTSEY_PAREN
+ *   ARTSEY_NAV ARTSEY_BT ARTSEY_CUSTOM
+ */
+
+/*
+ * NOTE ON INCLUDES
+ * Upstream carries its own <behaviors.dtsi> / keys.h / bt.h / outputs.h
+ * includes, but none of those files has an include guard. This file is meant
+ * to be included at the BOTTOM of an existing keymap that has already pulled
+ * them in, so they are deliberately omitted here to avoid re-defining every
+ * labelled behaviour node (`kp:`, `mo:`, `tog:`, ...) a second time.
+ * The including keymap MUST therefore have these live before the include:
+ *   <behaviors.dtsi> <dt-bindings/zmk/keys.h> <dt-bindings/zmk/bt.h>
+ *   <dt-bindings/zmk/outputs.h>
+ */
+
+/*****************************************
+ * Macros for filling in "&none" in the gaps of the Urchin's 34 key positions.
+ *****************************************/
+#define NONE0(X)
+#define NONE1(X) X
+#define NONE2(X) NONE1(X) X
+#define NONE3(X) NONE2(X) X
+#define NONE4(X) NONE3(X) X
+#define NONE5(X) NONE4(X) X
+#define NONE6(X) NONE5(X) X
+#define NONE7(X) NONE6(X) X
+#define NONE8(X) NONE7(X) X
+#define NONE9(X) NONE8(X) X
+#define NONE10(X) NONE9(X) X
+
+#define NONE(HUNDREDS,TENS,ONES) \
+	NONE##HUNDREDS(NONE10(NONE10(&none))) \
+	NONE##TENS(NONE10(&none)) \
+	NONE##ONES(&none)
+
+/*****************************************
+ * ARTSEY's 8 keys, mapped onto the Urchin's left half.
+ *
+ * The Urchin's transform gives the left half
+ *   row 0 -> positions 0-4   (Q W E R T)
+ *   row 1 -> positions 10-14 (A S D F G)
+ *   row 2 -> positions 20-24 (Z X C V B)
+ *   thumbs -> positions 30, 31
+ * Columns run pinky(0), ring(1), middle(2), index(3), inner(4).
+ *
+ * ARTSEY wants 4 keys per row with A/E under the index finger, so we use
+ * columns 0-3 and leave column 4 free (it doubles as the exit key below).
+ *
+ * Reference: upstream's corne_5_col_artsey_left.keymap uses the same
+ * columns of a 5-column half (KEY_S 0 / KEY_T 1 / KEY_R 2 / KEY_A 3 and
+ * KEY_O 5 / KEY_I 6 / KEY_Y 7 / KEY_E 8 on corne's transform).
+ *****************************************/
+#ifndef KEY_S
+#define KEY_S 0
+#define KEY_T 1
+#define KEY_R 2
+#define KEY_A 3
+#define KEY_O 10
+#define KEY_I 11
+#define KEY_Y 12
+#define KEY_E 13
+#endif
+
+/* Urchin left thumb + the free 5th column, used below */
+#define ARTSEY_THUMB_EXIT 30
+#define ARTSEY_THUMB_SPACE 31
+
+/*****************************************
+ * none padding for the 34-position Urchin keymap.
+ *   0 leading  + 4 keys + 6 middle + 4 keys + 16 trailing + 4 thumbs = 34
+ *****************************************/
+#define LEADING_NONES NONE(0, 0, 0)   /* nothing before position 0        */
+#define MIDDLE_NONES  NONE(0, 0, 6)   /* positions 4-9  (rest of row 0)   */
+#define TRAILING_NONES NONE(0, 1, 6)  /* positions 14-29 (rows 1 tail, 2) */
+
+/*****************************************
+ * Two blank keys on the BT layer, overridable.
+ *****************************************/
+#ifndef ARTSEY_BT_TOP
+#define ARTSEY_BT_TOP &out OUT_BLE
+#endif
+#ifndef ARTSEY_BT_BOTTOM
+#define ARTSEY_BT_BOTTOM &out OUT_USB
+#endif
+
+/*****************************************
+ * Combo / hold timings.
+ *****************************************/
+#ifndef TIMEOUT_COMBO_2
+#define TIMEOUT_COMBO_2 175
+#endif
+#ifndef TIMEOUT_COMBO_3
+#define TIMEOUT_COMBO_3 175
+#endif
+#ifndef TIMEOUT_COMBO_4
+#define TIMEOUT_COMBO_4 175
+#endif
+#ifndef TIMEOUT_LAYER_HOLD
+#define TIMEOUT_LAYER_HOLD 200
+#endif
+
+/*****************************************
+ * Base characters. Flip to COLEMAK by defining ARTSEY_COLEMAK 1.
+ *****************************************/
+#ifndef ARTSEY_COLEMAK
+#define ARTSEY_COLEMAK 0
+#endif
+
+#if ARTSEY_COLEMAK
+#define ARTSEY_BASE_A T
+#define ARTSEY_BASE_R S
+#define ARTSEY_BASE_T R
+#define ARTSEY_BASE_S A
+#define ARTSEY_BASE_E N
+#define ARTSEY_BASE_Y E
+#define ARTSEY_BASE_I I
+#define ARTSEY_BASE_O O
+#define ARTSEY_COMBO_N Y
+#else
+#define ARTSEY_BASE_A A
+#define ARTSEY_BASE_R R
+#define ARTSEY_BASE_T T
+#define ARTSEY_BASE_S S
+#define ARTSEY_BASE_E E
+#define ARTSEY_BASE_Y Y
+#define ARTSEY_BASE_I I
+#define ARTSEY_BASE_O O
+#define ARTSEY_COMBO_N N
+#endif
+
+/*****************************************
+ * ARTSEY's combo table.
+ *
+ * NOTE: every combo carries `layers = <...>`. Upstream leaves most of these
+ * un-gated; on the Urchin they MUST be gated or they would hijack normal
+ * typing (an un-gated KEY_A+KEY_E combo would fire on the base layer).
+ * A combo is live only when the named layer is the highest active one.
+ *****************************************/
+/ {
+	combos {
+		compatible = "zmk,combos";
+
+		/*** 2 key combos ***/
+		combo_enter      { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_E>; bindings = <&kp ENTER>; };
+		combo_control    { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_S>; bindings = <&sk LCTRL>; };
+		combo_gui        { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_Y KEY_S>; bindings = <&sk LGUI>; };
+		combo_alt        { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_I KEY_S>; bindings = <&sk LALT>; };
+		combo_backspace  { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_R>; bindings = <&kp BACKSPACE>; };
+		combo_delete     { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_I KEY_R>; bindings = <&kp DELETE>; };
+		combo_shift_lock { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_R KEY_Y>; bindings = <&kt LSHFT>; };
+
+		combo_b           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_O>; bindings = <&kp B>; };
+		combo_c           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_Y>; bindings = <&kp C>; };
+		combo_n           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_I KEY_O>; bindings = <&kp ARTSEY_COMBO_N>; };
+		combo_f           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_R>; bindings = <&kp F>; };
+		combo_g           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_R KEY_T>; bindings = <&kp G>; };
+		combo_u           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_Y KEY_I>; bindings = <&kp U>; };
+		combo_h           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_I>; bindings = <&kp H>; };
+		combo_v           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_R KEY_S>; bindings = <&kp V>; };
+		combo_j           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_T KEY_S>; bindings = <&kp J>; };
+		combo_w           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_S>; bindings = <&kp W>; };
+		combo_k           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_Y KEY_O>; bindings = <&kp K>; };
+		combo_comma       { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_Y>; bindings = <&kp COMMA>; };
+		combo_period      { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_I>; bindings = <&kp PERIOD>; };
+		combo_slash       { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_O>; bindings = <&kp SLASH>; };
+		combo_exclamation { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_T KEY_I>; bindings = <&kp EXCL>; };
+
+		combo_seven { layers = <ARTSEY_NUMBERS>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_R>; bindings = <&kp N7>; };
+		combo_eight { layers = <ARTSEY_NUMBERS>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_R KEY_T>; bindings = <&kp N8>; };
+		combo_nine  { layers = <ARTSEY_NUMBERS>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_Y>; bindings = <&kp N9>; };
+		combo_zero  { layers = <ARTSEY_NUMBERS>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_Y KEY_I>; bindings = <&kp N0>; };
+
+		/*** 3 key combos ***/
+		combo_esc              { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_A KEY_R KEY_O>; bindings = <&kp ESC>; };
+		combo_layer_navigation { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_R KEY_E KEY_I>; bindings = <&tog ARTSEY_NAV>; };
+
+		combo_m            { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_Y KEY_I KEY_O>; bindings = <&kp M>; };
+		combo_d            { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_A KEY_R KEY_T>; bindings = <&kp D>; };
+		combo_p            { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_E KEY_I KEY_O>; bindings = <&kp P>; };
+		combo_q            { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_A KEY_T KEY_S>; bindings = <&kp Q>; };
+		combo_x            { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_R KEY_T KEY_S>; bindings = <&kp X>; };
+		combo_l            { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_E KEY_Y KEY_I>; bindings = <&kp L>; };
+		combo_single_quote { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_A KEY_Y KEY_I>; bindings = <&kp SQT>; };
+
+		/*** 4 key combos ***/
+		combo_tab             { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_A KEY_R KEY_T KEY_O>; bindings = <&kp TAB>; };
+		combo_space           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_E KEY_Y KEY_I KEY_O>; bindings = <&kp SPACE>; };
+		combo_shift           { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_E KEY_R KEY_T KEY_S>; bindings = <&sk LSHFT>; };
+		combo_layer_bt_select { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_A KEY_E KEY_S KEY_O>; bindings = <&tog ARTSEY_BT>; };
+		combo_bt_clr          { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_R KEY_Y KEY_T KEY_I>; bindings = <&bt BT_CLR>; };
+
+		combo_z         { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_A KEY_R KEY_T KEY_S>; bindings = <&kp Z>; };
+		combo_caps_lock { layers = <ARTSEY>; timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_O KEY_I KEY_Y KEY_A>; bindings = <&kp CAPS>; };
+	};
+};
+
+/*****************************************
+ * ARTSEY's layer-hold behaviours: tap a letter, hold for the sub-layer.
+ *****************************************/
+/ {
+	behaviors {
+		layer_numbers_kp: layer_numbers_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_numbers_kp";
+			#binding-cells = <2>; tapping-term-ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
+			bindings = <&mo>, <&kp>; };
+		layer_symbols_kp: layer_symbols_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_symbols_kp";
+			#binding-cells = <2>; tapping-term-ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
+			bindings = <&mo>, <&kp>; };
+		layer_parentheticals_kp: layer_parentheticals_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_parentheticals_kp";
+			#binding-cells = <2>; tapping-term-ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
+			bindings = <&mo>, <&kp>; };
+		layer_custom_kp: layer_custom_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_custom_kp";
+			#binding-cells = <2>; tapping-term-ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
+			bindings = <&mo>, <&kp>; };
+	};
+};
+
+/*****************************************
+ * The ARTSEY layers themselves (left-handed, one-handed use).
+ *
+ * The including keymap's own layers must come FIRST so that ARTSEY lands on
+ * layer ids 6-12. Layer order is the order of the `keymap` node's children.
+ *****************************************/
+/ {
+	keymap {
+		compatible = "zmk,keymap";
+
+		artsey {
+			label = "ARTSEY";
+			bindings = <
+				LEADING_NONES
+				&layer_numbers_kp ARTSEY_NUMBERS ARTSEY_BASE_S   &kp ARTSEY_BASE_T   &kp ARTSEY_BASE_R   &layer_parentheticals_kp ARTSEY_PAREN ARTSEY_BASE_A
+				MIDDLE_NONES
+				&layer_custom_kp ARTSEY_CUSTOM ARTSEY_BASE_O     &kp ARTSEY_BASE_I   &kp ARTSEY_BASE_Y   &layer_symbols_kp ARTSEY_SYMBOLS ARTSEY_BASE_E
+				TRAILING_NONES
+				&tog ARTSEY &kp SPACE &none &none
+			>;
+		};
+		artsey_numbers {
+			label = "ARTSEY num";
+			bindings = <
+				LEADING_NONES
+				&mo ARTSEY_NUMBERS                &kp N3    &kp N2    &kp N1
+				MIDDLE_NONES
+				&none                             &kp N6    &kp N5    &kp N4
+				TRAILING_NONES
+				&none &none &none &none
+			>;
+		};
+		artsey_symbols {
+			label = "ARTSEY sym";
+			bindings = <
+				LEADING_NONES
+				&kp GRAVE                         &kp SEMI  &kp BSLH  &kp EXCL
+				MIDDLE_NONES
+				&kp EQUAL                         &kp MINUS &kp QMARK &mo ARTSEY_SYMBOLS
+				TRAILING_NONES
+				&none &none &none &none
+			>;
+		};
+		artsey_parentheticals {
+			label = "ARTSEY paren";
+			bindings = <
+				LEADING_NONES
+				&kp LBRC                          &kp LPAR  &kp RPAR  &mo ARTSEY_PAREN
+				MIDDLE_NONES
+				&kp RBRC                          &kp LBKT  &kp RBKT  &none
+				TRAILING_NONES
+				&none &none &none &none
+			>;
+		};
+		artsey_navigation {
+			label = "ARTSEY nav";
+			bindings = <
+				LEADING_NONES
+				&kp PG_UP                         &kp HOME  &kp UP    &kp END
+				MIDDLE_NONES
+				&kp PG_DN                         &kp LEFT  &kp DOWN  &kp RIGHT
+				TRAILING_NONES
+				&none &none &none &none
+			>;
+		};
+		artsey_bt {
+			label = "ARTSEY BT";
+			bindings = <
+				LEADING_NONES
+				ARTSEY_BT_TOP   &bt BT_SEL 2 &bt BT_SEL 1 &bt BT_SEL 0
+				MIDDLE_NONES
+				ARTSEY_BT_BOTTOM &bt BT_SEL 5 &bt BT_SEL 4 &bt BT_SEL 3
+				TRAILING_NONES
+				&none &none &none &none
+			>;
+		};
+		artsey_custom {
+			label = "ARTSEY misc";
+			bindings = <
+				LEADING_NONES
+				&none            &kp C_VOL_UP &kp INS    &kp C_MUTE
+				MIDDLE_NONES
+				&mo ARTSEY_CUSTOM &kp C_VOL_DN &kp PSCRN &sk RSHFT
+				TRAILING_NONES
+				&none &none &none &none
+			>;
+		};
+	};
+};
